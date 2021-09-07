@@ -3,42 +3,51 @@
 <?php  include "includes/navigation.php"; ?>
 
 <?php
-    if(isset($_POST["submit"])) {
-        $username =  $_POST["username"];
+    if($_SERVER["REQUEST_METHOD"] == "POST" || isset($_POST["register"])) {
+
+        $username = $_POST["username"];
         $email = $_POST["email"];
         $password = $_POST["password"];
 
-        $username = mysqli_real_escape_string($connection, $username);
-        $email = mysqli_real_escape_string($connection, $email);
-        $password = mysqli_real_escape_string($connection, $password);
+        $error = [
+            "username" => "",
+            "email" => "",
+            "password" => ""
+        ];
 
-        iF (!empty($username) && !empty($email) && !empty($password)) {
-            $password = password_hash($password, PASSWORD_BCRYPT, array('cost' => 12));
-
-           /*  $query = "SELECT rand_salt FROM users";
-            $select_rand_salt_query = mysqli_query($connection,$query);
-
-            if(!$select_rand_salt_query) {
-                die("Query Failed " . mysqli_error($connection, $query));
-            }
- */
-           /*  $row = mysqli_fetch_array($select_rand_salt_query);
-            $rand_salt = $row["rand_salt"];
-
-            $password = crypt($password, $rand_salt); */
-            
-
-            $query = "INSERT INTO users (username, user_email, user_password, user_role) VALUES ('$username', '$email', '$password', 'suscriber');";
-            $register_query = mysqli_query($connection, $query);
-
-            $message = "<h6 class='bg-success text-center'>Everything looks fine</h6>";
-        } else {
-            $message = "<h6 class='bg-danger text-center'>Must fill all inputs</h6>"; 
+        if (strlen($username) < 4) {
+            $error["username"] = "El nombre de usuario debe tener más de 4 caracteres";
+        }
+        if($username == "") {
+            $error["username"] = "El nombre de usuario debe tener más de 4 caracteres";
+        }
+        if(username_exists($username)) {
+            $error["username"] = "El nombre ya existe";
+        }
+        if(email_exists($email)) {
+            $error["email"] = "El email ya existe";
+        }
+        if($email == "") {
+            $error["email"] = "Ingrese un email válido";
+        }
+        if($password  == "") {
+            $error["password"] = "La contraseña no puede estar vacia";
+        }
+        if(strlen($password)  < 4) {
+            $error["password"] = "La contraseña debe tener más de 4 caracteres";
         }
 
-        
-    } else {
-        $message = "";
+        foreach ($error as $key => $value) {
+            if (empty($value)) {
+                unset($error[$key]); # Elimina la clave para que quede vacio.
+//                login_user($username, $password);
+            }
+        }
+
+        if(empty($error)) {
+            register_user($username, $email, $password);
+            login_user($username, $password);
+        }
     }
 ?>
 
@@ -54,19 +63,21 @@
                     <form role="form" action="registration.php" method="post" id="login-form" autocomplete="off">
                         <div class="form-group">
                             <label for="username" class="sr-only">username</label>
-                            <input type="text" name="username" id="username" class="form-control" placeholder="Enter Desired Username">
+                            <input value="<?php echo $username ?? ''; ?>" autocomplete="on" type="text" name="username" id="username" class="form-control" placeholder="Nombre de usuario">
+                            <p class="bg-danger"><?php echo $error["username"] ?? ''; ?></p>
                         </div>
                          <div class="form-group">
                             <label for="email" class="sr-only">Email</label>
-                            <input type="email" name="email" id="email" class="form-control" placeholder="somebody@example.com">
+                            <input value="<?php echo $email ?? ''; ?>" autocomplete="on" type="email" name="email" id="email" class="form-control" placeholder="somebody@example.com">
+                            <p class="bg-danger"><?php echo $error["email"] ?? ''; ?></p>
                         </div>
                          <div class="form-group">
                             <label for="password" class="sr-only">Password</label>
-                            <input type="password" name="password" id="key" class="form-control" placeholder="Password">
+                            <input type="password" name="password" id="key" class="form-control" placeholder="Contraseña">
+                            <p class="bg-danger"><?php echo $error["password"] ?? ''; ?></p>
                         </div>
                 
-                        <input type="submit" name="submit" id="btn-login" class="btn btn-custom btn-lg btn-block" value="Register">
-                        <?php echo "$message"?>
+                        <input type="submit" name="register" id="btn-login" class="btn btn-custom btn-lg btn-block" value="Register">
                     </form>
                  
                 </div>

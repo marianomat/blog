@@ -21,25 +21,36 @@
                     if(isset($_GET["category"])) {
                         $cat_id = mysqli_real_escape_string($connection, $_GET["category"]);
                     }
-
-                    $query = "SELECT * FROM posts WHERE post_cat = $cat_id AND post_status = 'live'";
-                    $select_all_posts_query = mysqli_query($connection, $query);
-
-                    if(mysqli_num_rows($select_all_posts_query) == 0) {
-                        echo "No posts in this category yet";
+                    if(is_admin($_SESSION["username"])) {
+                        $query1 = mysqli_prepare($connection, "SELECT post_id, post_title, post_autor, post_date, post_img, post_content
+                                                                    FROM posts WHERE post_cat = ?");
                     } else {
-                        while($row = mysqli_fetch_assoc($select_all_posts_query)) {
-                        $post_id = $row["post_id"];
-                        $post_title = $row["post_title"];
-                        $post_autor = $row["post_autor"];
-                        $post_date = $row["post_date"];
-                        $post_img = $row["post_img"];
-                        $post_content = $row["post_content"];
-                    
-                        ?>
-                    
+                        $query2 = mysqli_prepare($connection, "SELECT post_id, post_title, post_autor, post_date, post_img, post_content
+                                FROM posts WHERE post_cat = ? AND post_status = ?" );
+                        $live = "live";
+                    }
+
+                    if(isset($query1)) {
+                        # usamos i si es int, usamos s si es string
+                        mysqli_stmt_bind_param($query1, "i", $cat_id);
+                        mysqli_stmt_execute($query1);
+                        mysqli_stmt_bind_result($query1, $post_id, $post_title, $post_autor, $post_date, $post_img, $post_content);
+                        mysqli_stmt_store_result($query1);
+                        $final_query = $query1;
+                    } else {
+                        mysqli_stmt_bind_param($query2, "is", $cat_id, $live);
+                        mysqli_stmt_execute($query2);
+                        mysqli_stmt_bind_result($query2, $post_id, $post_title, $post_autor, $post_date, $post_img, $post_content);
+                        mysqli_stmt_store_result($query2);
+                        $final_query = $query2;
+                    }
+
+                    if(mysqli_stmt_num_rows($final_query) === 0) {
+                        echo "No posts in this category yet";
+                    }
+                    while(mysqli_stmt_fetch($final_query)):
+                    ?>
                         <!-- Blog Post -->
-                        
                         <h2>
                             <a href="post.php?p_id=<?php echo $post_id;?>"><?php echo $post_title; ?></a>
                         </h2>
@@ -53,8 +64,10 @@
                         <p><?php echo $post_content; ?></p>
                         <a class="btn btn-primary" href="#">Read More <span class="glyphicon glyphicon-chevron-right"></span></a>
                         <hr>
-                        <?php }
-                    } ?>
+                    <?php
+                        endwhile;
+                        mysqli_stmt_close($final_query);
+                    ?>
             </div>
 
             <!-- Blog Sidebar Widgets Column -->

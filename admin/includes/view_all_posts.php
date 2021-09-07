@@ -78,7 +78,7 @@
         </thead>
         <tbody>
             <?php
-                $query = "SELECT * FROM posts ORDER BY post_id DESC;";
+                $query = "SELECT * FROM posts INNER JOIN categories ON cat_id = post_cat ORDER BY post_id DESC;";
                 $select_posts = mysqli_query($connection, $query);
 
                 while($row = mysqli_fetch_assoc($select_posts)) {
@@ -92,21 +92,15 @@
                     $post_comments_count = $row["post_comment_count"];
                     $post_date = $row["post_date"];
                     $post_viewcount = $row["post_viewcount"];
+                    $cat_id = $row["cat_id"];
+                    $cat_title = $row["cat_title"];
 
                     echo "<tr>";
                     echo "<td><input class='checkBoxes' type='checkbox' name='checkBoxArray[]' value=$post_id></td>";
                     echo "<td>$post_id</td>";
                     echo "<td>$post_autor</td>";
                     echo "<td><a href='../post.php?p_id=$post_id'>$post_title</a></td>";
-
-                    $query = "SELECT * FROM categories WHERE cat_id = $post_category;";
-                    $select_cat = mysqli_query($connection, $query);
-                    while($row = mysqli_fetch_assoc($select_cat)) {
-                        $cat_id = $row["cat_id"];
-                        $cat_title = $row["cat_title"];
-                    }             
                     echo "<td>$cat_title</td>";
-
                     echo "<td>$post_status</td>";
                     echo "<td><img width='100px' height='40px' src='../images/$post_image'/></td>";
                     echo "<td>$post_tags</td>";
@@ -118,10 +112,14 @@
                     echo "<td><a href='comments.php?p_id=$post_id'>$comment_count</a></td>";
                     echo "<td>$post_date</td>";
                     echo "<td><a onClick=\"return confirm('Are you sure you want to reset viewcount?');\" href='posts.php?reset_viewcount={$post_id}'>$post_viewcount</a></td>";
-                    echo "<td><a href='posts.php?source=edit_post&p_id={$post_id}'>Edit</a></td>";
-                    echo "<td><a onClick=\"return confirm('Are you sure you want to delete?');\" href='posts.php?delete={$post_id}'>Delete</a></td>";
+                    echo "<td><a class='btn btn-primary' href='posts.php?source=edit_post&p_id={$post_id}'>Edit</a></td>";
+                    ?>
+                    <form method="POST">
+                        <input type="hidden" value="<?php echo $post_id?>" name="post_id">
+                        <td><button class="btn btn-danger" type="submit" name="delete">Delete</button></td>
+                    </form>
+                    <?php
                     echo "</tr>";
-
                 }
             ?>
         </tbody>
@@ -130,12 +128,12 @@
 
 
 <?php 
-    if(isset($_GET["delete"])) {
-        $post_id_to_delete = $_GET["delete"];
+    if(isset($_POST["delete"])) {
+        $post_id_to_delete = $_POST["post_id"];
         $post_id_to_delete = mysqli_real_escape_string($connection, $post_id_to_delete);
         $query = "DELETE FROM posts WHERE post_id = $post_id_to_delete";
         $delete_query = mysqli_query($connection, $query);
-        header("Location: posts.php"); 
+        header("Location: posts.php");
     }
     if(isset($_GET["reset_viewcount"])) {
         $post_id_to_reset = $_GET["reset_viewcount"];

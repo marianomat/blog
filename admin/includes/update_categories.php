@@ -22,10 +22,15 @@
             <?php 
                     // Editar categoria
                 if(isset($_POST["update_cat"])) {
-                    $cat_title_to_update = mysqli_real_escape_string($connection, $_POST["cat_title"]);
-                    $query = "UPDATE categories SET cat_title = '$cat_title_to_update' WHERE cat_id = $cat_id_to_update;";
-                    $update_query = mysqli_query($connection, $query);
-                    header("location: categories.php"); //Refresh page
+                    $cat_title = $_POST["cat_title"];
+                    $stmt = mysqli_prepare($connection, "UPDATE categories SET cat_title = ? WHERE cat_id = ?;");
+                    mysqli_stmt_bind_param($stmt, "si", $cat_title, $cat_id);
+                    mysqli_stmt_execute($stmt);
+                    if(!$stmt) {
+                        die("Query failed" . mysqli_error($connection));
+                    }
+                    mysqli_stmt_close($stmt);
+                    redirect("categories.php");
                 }
             
             ?>

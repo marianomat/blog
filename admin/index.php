@@ -87,7 +87,7 @@
                                     </div>
                                     <div class="col-xs-9 text-right">
                                     <?php
-                                        $user_count = rows_count("comments");
+                                        $user_count = rows_count("users");
                                     ?>
                                     <div class='huge'><?php echo $user_count; ?></div>
                                         <div> Users</div>
