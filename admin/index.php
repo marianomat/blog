@@ -15,7 +15,6 @@
                             Welcome To Admin
                             <small><?php echo $_SESSION['username'];?></small>
                         </h1>
-                        
                         <ol class="breadcrumb">
                             <li>
                                 <i class="fa fa-dashboard"></i> <a href="index.php">Dashboard</a>
@@ -26,11 +25,8 @@
                         </ol>
                     </div>
                 </div>
-                <!-- /.row -->
 
-                       
                 <!-- /.row -->
-                
                 <div class="row">
                     <div class="col-lg-3 col-md-6">
                         <div class="panel panel-primary">
@@ -40,15 +36,10 @@
                                         <i class="fa fa-file-text fa-5x"></i>
                                     </div>
                                     <div class="col-xs-9 text-right">
-
-                                <?php
-                                    $query = "SELECT * FROM posts;";
-                                    $post_count_query = mysqli_query($connection, $query);
-
-                                    $post_count = mysqli_num_rows($post_count_query);
-                                ?>
-
-                                <div class='huge'><?php echo $post_count; ?></div>
+                                    <?php
+                                        $post_count = rows_count("posts");
+                                    ?>
+                                    <div class='huge'><?php echo $post_count; ?></div>
                                         <div>Posts</div>
                                     </div>
                                 </div>
@@ -70,11 +61,8 @@
                                         <i class="fa fa-comments fa-5x"></i>
                                     </div>
                                     <div class="col-xs-9 text-right">
-                                    <?php 
-                                        $query = "SELECT * FROM comments;";
-                                        $comment_count_query = mysqli_query($connection, $query);
-
-                                        $comment_count = mysqli_num_rows($comment_count_query);
+                                    <?php
+                                        $comment_count = rows_count("comments");
                                     ?>
                                     <div class='huge'><?php echo $comment_count; ?></div>
                                     <div>Comments</div>
@@ -98,11 +86,8 @@
                                         <i class="fa fa-user fa-5x"></i>
                                     </div>
                                     <div class="col-xs-9 text-right">
-                                    <?php 
-                                        $query = "SELECT * FROM users;";
-                                        $user_count_query = mysqli_query($connection, $query);
-
-                                        $user_count = mysqli_num_rows($user_count_query);
+                                    <?php
+                                        $user_count = rows_count("comments");
                                     ?>
                                     <div class='huge'><?php echo $user_count; ?></div>
                                         <div> Users</div>
@@ -126,11 +111,8 @@
                                         <i class="fa fa-list fa-5x"></i>
                                     </div>
                                     <div class="col-xs-9 text-right">
-                                         <?php 
-                                            $query = "SELECT * FROM categories;";
-                                            $category_count_query = mysqli_query($connection, $query);
-
-                                            $category_count = mysqli_num_rows($category_count_query);
+                                         <?php
+                                         $category_count = rows_count("categories");
                                         ?>
                                         <div class='huge'><?php echo $category_count; ?></div>
                                         <div>Categories</div>
@@ -150,23 +132,10 @@
                 <!-- /.row -->
 
                 <?php
-
-                    $query = "SELECT * FROM posts WHERE post_status = 'draft';";
-                    $select_draft_posts = mysqli_query($connection, $query);
-                    $draft_count = mysqli_num_rows($select_draft_posts);
-
-                    $query = "SELECT * FROM posts WHERE post_status = 'live';";
-                    $select_live_posts = mysqli_query($connection, $query);
-                    $live_count = mysqli_num_rows($select_live_posts);
-
-                    $query = "SELECT * FROM comments WHERE comment_status = 'unapproved';";
-                    $select_unapproved_comments = mysqli_query($connection, $query);
-                    $unapproved_count = mysqli_num_rows($select_unapproved_comments);
-
-                    $query = "SELECT * FROM users WHERE user_role = 'suscriber';";
-                    $select_suscribers = mysqli_query($connection, $query);
-                    $suscriber_count = mysqli_num_rows($select_suscribers);
-
+                    $draft_count = row_count_one_condition("posts", "post_status", "draft");
+                    $live_count = row_count_one_condition("posts", "post_status", "live");
+                    $unapproved_count = row_count_one_condition("comments", "comment_status", "unapproved");
+                    $suscriber_count = row_count_one_condition("users", "user_role", "suscriber");
                 ?>
 
                 <div class="row">
@@ -185,20 +154,18 @@
                                 for ($i = 0; $i < 7; $i++) {
                                     echo "['$elements_text[$i]', $elements_count[$i]] ,";
                                 }
-
                                 ?>
                                 /* ['Post', 1000], */
                             ]);
 
                             var options = {
-                            chart: {
-                                title: '',
-                                subtitle: '',
-                            }
+                                chart: {
+                                    title: '',
+                                    subtitle: '',
+                                }
                             };
 
                             var chart = new google.charts.Bar(document.getElementById('columnchart_material'));
-
                             chart.draw(data, google.charts.Bar.convertOptions(options));
                         }
                     </script>

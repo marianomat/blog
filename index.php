@@ -7,24 +7,18 @@
 
     <!-- Page Content -->
     <div class="container">
-
         <div class="row">
-
             <!-- Blog Entries Column -->
             <div class="col-md-8">
-
                 <h1 class="page-header">
                     <?php
                         if(isset($_GET["autor"])) {
                             echo "Posts by " . $_GET["autor"];
                         } else {
-                            echo "Page Heading";
+                            echo "Ultimos Posts";
                         }
                     ?>
-                    
-                    
                 </h1>
-
                 <?php
                     $post_query_count = "SELECT * FROM posts WHERE post_status = 'live';";
                     $find_count = mysqli_query($connection, $post_query_count);
@@ -33,11 +27,7 @@
                     if ($postcount == 0) {
                         echo "no post"; 
                     } else {
-
-                   
-
                         $postcount = ceil($postcount / 5);
-
                         $page = $_GET["page"] ?? "";
 
                         if($page == "" || $page == 1) {
@@ -46,8 +36,6 @@
                             $page_1 = ($page * 5) - 5;
                         }
 
-
-
                         if(isset($_GET["autor"])) {
                             $post_autor = $_GET["autor"];
                             $query = "SELECT * FROM posts WHERE post_autor = $post_autor AND post_status = 'live' LIMIT $page_1,5;";
@@ -55,7 +43,6 @@
                             $query = "SELECT * FROM posts WHERE post_status = 'live' LIMIT $page_1,5";
                         }
                         
-
                         $select_all_posts_query = mysqli_query($connection, $query);
 
                         while($row = mysqli_fetch_assoc($select_all_posts_query)) {
@@ -67,6 +54,14 @@
                             $post_status = $row["post_status"];
                             $post_content = substr($row["post_content"],0,100);
 
+                            $query = "SELECT * FROM users WHERE user_id = $post_autor";
+                            $select_autor = mysqli_query($connection, $query);
+
+                            while($row = mysqli_fetch_array($select_autor)) {
+                                $user_first_name = $row["user_first_name"];
+                                $user_last_name = $row["user_last_name"];
+                            }
+
                             if($post_status === "live") {
                                 ?>
                                 <!-- Blog Post -->
@@ -75,27 +70,24 @@
                                     <a href="post.php?p_id=<?php echo $post_id;?>"><?php echo $post_title; ?></a>
                                 </h2>
                                 <p class="lead">
-                                    by <a href="index.php?autor=<?php echo $post_autor; ?>"><?php echo $post_autor; ?></a>
+                                    by <a href="index.php"><?php echo $user_first_name . " ".$user_last_name; ?></a>
                                 </p>
                                 <p><span class="glyphicon glyphicon-time"></span> Posted on <?php echo $post_date; ?></p>
                                 <hr>
                                 <a href="post.php?p_id=<?php echo $post_id;?>"><img class="img-responsive" src="images/<?php echo $post_img; ?>" alt=""></a>
                                 <hr>
                                 <p><?php echo $post_content; ?></p>
-                                <a class="btn btn-primary" href="post.php?p_id=<?php echo $post_id;?>">Read More <span class="glyphicon glyphicon-chevron-right"></span></a>
+                                <a class="btn btn-primary" href="post.php?p_id=<?php echo $post_id;?>">Ver Post <span class="glyphicon glyphicon-chevron-right"></span></a>
 
                                 <hr>
                             <?php
                             }
                         }
                         ?>
-                  
                 <?php } ?>
             </div>
-
             <!-- Blog Sidebar Widgets Column -->
             <?php include "includes/sidebar.php"?>
-
         </div>
         <!-- /.row -->
 

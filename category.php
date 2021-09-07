@@ -23,7 +23,6 @@
                     }
 
                     $query = "SELECT * FROM posts WHERE post_cat = $cat_id AND post_status = 'live'";
-
                     $select_all_posts_query = mysqli_query($connection, $query);
 
                     if(mysqli_num_rows($select_all_posts_query) == 0) {
@@ -53,14 +52,9 @@
                         <hr>
                         <p><?php echo $post_content; ?></p>
                         <a class="btn btn-primary" href="#">Read More <span class="glyphicon glyphicon-chevron-right"></span></a>
-
                         <hr>
-                        
                         <?php }
                     } ?>
-
-                    
-                    
             </div>
 
             <!-- Blog Sidebar Widgets Column -->

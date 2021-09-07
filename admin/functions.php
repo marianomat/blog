@@ -5,8 +5,20 @@
             die("Query Failed". mysqli_error($connection));
         } 
     }
-    
-    
+
+    function row_count_one_condition($entity, $condition, $condition_value) {
+        global $connection;
+        $query = "SELECT * FROM $entity WHERE $condition = '$condition_value';";
+        $selected_rows = mysqli_query($connection, $query);
+        return mysqli_num_rows($selected_rows);
+    }
+
+    function rows_count($entity) {
+        global $connection;
+        $query = "SELECT * FROM $entity;";
+        $count_query = mysqli_query($connection, $query);
+        return mysqli_num_rows($count_query);
+    }
     function insert_categories() {
         global $connection;
         if(isset($_POST["submit"])) {

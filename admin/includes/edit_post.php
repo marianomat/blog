@@ -26,7 +26,7 @@
         $post_category = mysqli_real_escape_string($connection, $_POST["post_category"]);
         $post_status = mysqli_real_escape_string($connection, $_POST["post_status"]);
         $post_tags = mysqli_real_escape_string($connection, $_POST["post_tags"]);
-        $post_content = mysqli_real_escape_string($connection, $_POST["post_content"]);
+        $post_content = $_POST["post_content"];
         $post_image = $_FILES["post_img"]["name"];
         $post_image_temp = $_FILES["post_img"]["tmp_name"];
 
