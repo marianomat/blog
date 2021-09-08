@@ -112,6 +112,7 @@
 
     function redirect($location) {
         return Header("Location: $location");
+        die();
     }
 
     function register_user($username, $email, $password) {
