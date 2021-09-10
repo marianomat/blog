@@ -6,7 +6,7 @@
 <?php 
     if(isset($_SESSION["user_role"])) {
         if($_SESSION["user_role"] == "suscriber") {
-            #header("Location: ../index.php");
+//            header("Location: ../index.php");
         } 
     } else {
         header("Location: ../index.php");
@@ -26,7 +26,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>SB Admin - Bootstrap Admin Template</title>
+    <title>MP - Panel de usuarios</title>
 
     <!-- Bootstrap Core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">

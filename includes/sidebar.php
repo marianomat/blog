@@ -3,7 +3,7 @@
                 <!-- Blog Search Well -->
              
                 <div class="well">
-                    <h4>Blog Search</h4>
+                    <h4>Buscar Posts</h4>
                     <form action="search.php" method="POST">
                         <div class="input-group">
                             <input name="search" type="text" class="form-control">
@@ -24,12 +24,12 @@
                    
                 ?>
                         <div class="well">
-                            <h4><?php echo "Welcome " . $_SESSION['username'] ?></h4>
+                            <h4><?php echo "Bienvenido " . $_SESSION['username'] ?></h4>
                             <form action="includes/logout.php" method="POST">
                                <div class="input-group">
                                     <span class="input-group-btn">
                                         <button class="btn btn-primary" type="submit" name="login">
-                                            Logout 
+                                            Desloguear
                                         </button>
                                     </span>
                                 </div>
@@ -42,7 +42,7 @@
                  ?>
              
                 <div class="well">
-                    <h4>Login</h4>
+                    <h4>Ingresar</h4>
                     <form action="includes/login.php" method="POST">
                         <div class="form-group">
                             <input name="username" type="text" class="form-control" placeholder="Enter Username">
@@ -64,8 +64,11 @@
 
                 <!-- Blog Categories Well -->
                 <?php
-                    $query = "SELECT * FROM categories";
+                    $query = "SELECT cat_title, cat_id FROM categories";
                     $select_categories_sidebar_query = mysqli_query($connection, $query);
+                    $stmt = mysqli_prepare($connection, $query);
+                    mysqli_stmt_execute($stmt);
+                    mysqli_stmt_bind_result($stmt, $cat_title, $cat_id);
                 ?>
 
                 <div class="well">
@@ -74,13 +77,12 @@
                         <div class="col-lg-12">
                             <ul class="list-unstyled">
                                 <?php
-                                    while($row = mysqli_fetch_assoc($select_categories_sidebar_query)) {
-                                        $cat_title = $row["cat_title"];
-                                        $cat_id = $row["cat_id"];
+                                    while(mysqli_stmt_fetch($stmt)):
                                         echo "<li> 
                                                     <a href='category.php?category=$cat_id'> {$cat_title} </a>
                                              </li>";
-                                    }
+                                    endwhile;
+                                    mysqli_stmt_close($stmt);
                                 ?>
                             </ul>
                         </div>

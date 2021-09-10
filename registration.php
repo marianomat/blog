@@ -3,7 +3,7 @@
 <?php  include "includes/navigation.php"; ?>
 
 <?php
-    if($_SERVER["REQUEST_METHOD"] == "POST" || isset($_POST["register"])) {
+    if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["register"])) {
 
         $username = $_POST["username"];
         $email = $_POST["email"];

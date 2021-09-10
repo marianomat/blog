@@ -12,17 +12,8 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <h1 class="page-header">
-                            Welcome To Admin
-                            <small><?php echo $_SESSION['username'];?></small>
+                            Bienvenido
                         </h1>
-                        <ol class="breadcrumb">
-                            <li>
-                                <i class="fa fa-dashboard"></i> <a href="index.php">Dashboard</a>
-                            </li>
-                            <li class="active">
-                                <i class="fa fa-file"></i> Blank Page
-                            </li>
-                        </ol>
                     </div>
                 </div>
 
@@ -46,7 +37,7 @@
                             </div>
                             <a href="./posts.php">
                                 <div class="panel-footer">
-                                    <span class="pull-left">View Details</span>
+                                    <span class="pull-left">Ver detalles</span>
                                     <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
                                     <div class="clearfix"></div>
                                 </div>
@@ -65,13 +56,13 @@
                                         $comment_count = rows_count("comments");
                                     ?>
                                     <div class='huge'><?php echo $comment_count; ?></div>
-                                    <div>Comments</div>
+                                    <div>Comentarios</div>
                                     </div>
                                 </div>
                             </div>
                             <a href="./comments.php">
                                 <div class="panel-footer">
-                                    <span class="pull-left">View Details</span>
+                                    <span class="pull-left">Ver detalles</span>
                                     <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
                                     <div class="clearfix"></div>
                                 </div>
@@ -90,13 +81,13 @@
                                         $user_count = rows_count("users");
                                     ?>
                                     <div class='huge'><?php echo $user_count; ?></div>
-                                        <div> Users</div>
+                                        <div> Usuarios</div>
                                     </div>
                                 </div>
                             </div>
                             <a href="./users.php">
                                 <div class="panel-footer">
-                                    <span class="pull-left">View Details</span>
+                                    <span class="pull-left">Ver detalles</span>
                                     <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
                                     <div class="clearfix"></div>
                                 </div>
@@ -115,13 +106,13 @@
                                          $category_count = rows_count("categories");
                                         ?>
                                         <div class='huge'><?php echo $category_count; ?></div>
-                                        <div>Categories</div>
+                                        <div>Categorias</div>
                                     </div>
                                 </div>
                             </div>
                             <a href="./categories.php">
                                 <div class="panel-footer">
-                                    <span class="pull-left">View Details</span>
+                                    <span class="pull-left">Ver detalles</span>
                                     <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
                                     <div class="clearfix"></div>
                                 </div>
@@ -145,10 +136,10 @@
 
                         function drawChart() {
                             let data = google.visualization.arrayToDataTable([
-                                ['Data', 'Count'],
+                                ['Info', 'Cantidad'],
 
                                 <?php
-                                $elements_text = ["All Posts", "Active Posts", "Draft Posts", "Categories", "Users", "Suscriber", "Comments", "Unapproved Comments"];
+                                $elements_text = ["Posts", "Posts activos", "Posts borradores", "Categorias", "Usuarios", "Suscriptores", "Comentarios", "Comentarios sin aprobar"];
                                 $elements_count = [$post_count, $live_count, $draft_count, $category_count, $user_count, $suscriber_count, $comment_count, $unapproved_count];
 
                                 for ($i = 0; $i < 7; $i++) {

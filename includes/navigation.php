@@ -11,22 +11,19 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="/cms">Mariano Blog</a>
+                <a class="navbar-brand" href="/cms">MP</a>
             </div>
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
-
-
                     <?php
-                        $query = "SELECT * FROM categories";
-                        $select_all_categories_query = mysqli_query($connection, $query);
-
+                        $query = "SELECT cat_title, cat_id FROM categories";
+                        $stmt = mysqli_prepare($connection, $query);
+                        mysqli_stmt_execute($stmt);
+                        mysqli_stmt_bind_result($stmt, $cat_title, $cat_id);
                         $registration = "registration.php";
 
-                        while($row = mysqli_fetch_assoc($select_all_categories_query)) {
-                            $cat_title = $row["cat_title"];
-                            $cat_id = $row["cat_id"];
+                        while(mysqli_stmt_fetch($stmt)) {
                             $category_class = "";
                             $registration_class = "";
                             $page_name = basename($_SERVER["PHP_SELF"]);
@@ -38,15 +35,15 @@
                             }
                             echo "<li class='$category_class'> <a href='category.php?category=$cat_id'> {$cat_title} </a> </li>";
                         }
+                        mysqli_stmt_close($stmt);
                     ?>
                     <li> <a href='admin'> ADMIN </a> </li>
-                    <li class="<?php echo $registration_class?>"> <a href='registration.php'> REGISTER </a> </li>
+                    <li class="<?php echo $registration_class?>"> <a href='registration.php'> Registrarse </a> </li>
                     <?php 
-                        #echo $_SESSION['user_role'];
                         if(isset($_SESSION['user_role'])) {
                             if(isset($_GET['p_id'])) {
                                 $post_id = $_GET['p_id'];
-                                echo "<li> <a href='admin/posts.php?source=edit_post&p_id=$post_id'> Edit Post </a> </li>";
+                                echo "<li> <a href='admin/posts.php?source=edit_post&p_id=$post_id'> Editar Post </a> </li>";
                             }
                         }
                     ?>

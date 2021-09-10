@@ -3,29 +3,22 @@
         $post_id = $_GET["p_id"];
     }
 
-    $query = "SELECT * FROM posts WHERE post_id = $post_id;";
-    $select_post_by_id = mysqli_query($connection, $query);
-
-    while($row = mysqli_fetch_assoc($select_post_by_id)) {
-        $post_id = $row["post_id"];
-        $post_autor = $row["post_autor"];
-        $post_title = $row["post_title"];
-        $post_category = $row["post_cat"];
-        $post_status = $row["post_status"];
-        $post_image = $row["post_img"];
-        $post_tags = $row["post_tags"];
-        $post_comments_count = $row["post_comment_count"];
-        $post_date = $row["post_date"];
-        $post_content = $row["post_content"];
-    }
-
+    $query = "SELECT post_id, post_autor, post_title, post_cat, post_status, post_img, post_tags, post_comment_count, post_date, post_content 
+FROM posts WHERE post_id = ?";
+    $stmt = mysqli_prepare($connection, $query);
+    mysqli_stmt_bind_param($stmt, "i", $post_id);
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_bind_result($stmt, $post_id, $post_autor, $post_title, $post_category,
+        $post_status, $post_image, $post_tags, $post_comments_count, $post_date, $post_content);
+    mysqli_stmt_fetch($stmt);
+    mysqli_stmt_close($stmt);
 
     if(isset($_POST["update_post"])) {
-        $post_autor = mysqli_real_escape_string($connection, $_POST["post_autor"]);
-        $post_title = mysqli_real_escape_string($connection, $_POST["post_title"]);
-        $post_category = mysqli_real_escape_string($connection, $_POST["post_category"]);
-        $post_status = mysqli_real_escape_string($connection, $_POST["post_status"]);
-        $post_tags = mysqli_real_escape_string($connection, $_POST["post_tags"]);
+        $post_autor = $_POST["post_autor"];
+        $post_title = $_POST["post_title"];
+        $post_category = $_POST["post_category"];
+        $post_status = $_POST["post_status"];
+        $post_tags = $_POST["post_tags"];
         $post_content = $_POST["post_content"];
         $post_image = $_FILES["post_img"]["name"];
         $post_image_temp = $_FILES["post_img"]["tmp_name"];
@@ -33,52 +26,51 @@
         move_uploaded_file($post_image_temp, "../images/$post_image");
 
         if(empty($post_image)) {
-            $query = "SELECT * FROM posts WHERE post_id = $post_id;";
-            $select_image = mysqli_query($connection, $query);
-
-            while($row = mysqli_fetch_assoc ($select_image)) {
-                $post_image = $row["post_img"];
-            }
+            $query = "SELECT post_img FROM posts WHERE post_id = ?";
+            $stmt = mysqli_prepare($connection, $query);
+            mysqli_stmt_bind_param($stmt, "i", $post_id);
+            mysqli_stmt_execute($stmt);
+            mysqli_stmt_bind_result($stmt, $post_image);
+            mysqli_stmt_fetch($stmt);
+            mysqli_stmt_close($stmt);
         }
 
         $query = "UPDATE posts SET 
-        post_cat = $post_category,
-        post_title = '$post_title',
-        post_autor = '$post_autor',
+        post_cat = ?,
+        post_title = ?,
+        post_autor = ?,
         post_date = NOW(),
-        post_img = '$post_image',
-        post_content = '$post_content',
-        post_tags = '$post_tags',
-        post_status = '$post_status'
-        WHERE post_id = $post_id;";
-
-        $update_post_query = mysqli_query($connection, $query);
-        confirm_query($update_post_query);
-
-
-        echo "<p class='bg-success'>Post Updated, <a href='../post.php?p_id=$post_id'>View Post </a></p>";
+        post_img = ?,
+        post_content = ?,
+        post_tags = ?,
+        post_status = ?
+        WHERE post_id = ?";
+        $stmt = mysqli_prepare($connection, $query);
+        mysqli_stmt_bind_param($stmt,"issssssi", $post_category, $post_title, $post_autor, $post_image, $post_content, $post_tags,
+        $post_status, $post_id);
+        mysqli_stmt_execute($stmt);
+        mysqli_stmt_close($stmt);
+        echo "<p class='bg-success'>Post editado <a href='../post.php?p_id=$post_id'>Ver Post </a></p>";
         
     }
 ?>
 
 <form method="POST" action="" enctype="multipart/form-data">
     <div class="form-group">
-        <label for="title">Post Title</label>
+        <label for="title">Titulo</label>
         <input type="text" class="form-control" name="post_title" value="<?php echo $post_title ?>">
     </div>
     <div class="form-group">
-        <label for="post_category">Post category</label>
+        <label for="post_category">Categoria</label>
         </br>
         <select name="post_category" id="post_category">
             <?php 
-                $query = "SELECT * FROM categories;";
-                $select_categories = mysqli_query($connection, $query);
+                $query = "SELECT cat_id, cat_title FROM categories";
+                $stmt = mysqli_prepare($connection,$query);
+                mysqli_stmt_execute($stmt);
+                mysqli_stmt_bind_result($stmt, $cat_id, $cat_title);
 
-                confirm_query($select_categories);
-
-                while($row = mysqli_fetch_assoc($select_categories)) {
-                    $cat_id = $row["cat_id"];
-                    $cat_title = $row["cat_title"];
+                while(mysqli_stmt_fetch($stmt)) {
                     if($cat_id == $post_category){
                         $selected = "selected";
                     } else {
@@ -86,15 +78,16 @@
                     }
                     echo "<option " . $selected .   " value='$cat_id'>$cat_title</option>";
                 }
+                mysqli_stmt_close($stmt);
             ?>
         </select>
     </div>
     <div class="form-group">
-        <label for="post_autor">Post Autor</label>
+        <label for="post_autor">Autor</label>
         <input type="text" class="form-control" name="post_autor" value="<?php echo $post_autor ?>" id="post_autor">
     </div>
     <div class="form-group">
-        <label for="post_status">Post Status</label>
+        <label for="post_status">Estado</label>
  
         </br>
         <select name="post_status" id="post_status">
@@ -102,31 +95,31 @@
 
             <?php 
                 if($post_status === "live") {
-                    echo "<option value='draft'>draft</option>";
+                    echo "<option value='draft'>Borrador</option>";
                 } else {
-                    echo "<option value='live'>live</option>";
+                    echo "<option value='live'>Activo</option>";
                 }
             ?>
         </select>
 
     </div>
     <div class="form-group">
-        <label for="post_img">Post Image</label>
+        <label for="post_img">Imagen</label>
         <input type="file" name="post_img" id="post_img">
         <img width="100" src="../images/<?php echo $post_image;?>" alt="">
     </div>
     <div class="form-group">
-        <label for="post_tags">Post Tags</label>
+        <label for="post_tags">Tags</label>
         <input type="text" class="form-control" name="post_tags" value="<?php echo $post_tags?>" id="post_tags">
     </div>
     <div class="form-group">
-        <label for="summernote">Post Content</label>
+        <label for="summernote">Contenido</label>
         <textarea type="text" class="form-control" name="post_content" cols="30" rows="10" id="summernote">
             <?php echo $post_content ?>
         </textarea>
     </div>
      <div class="form-group">
-        <input type="submit" class="btn btn-primary" name="update_post" value="Publish Post" >
+        <input type="submit" class="btn btn-primary" name="update_post" value="Publicar Post" >
     </div>
 
 </form>

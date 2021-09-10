@@ -14,14 +14,14 @@
             <div class="col-md-8">
 
                 <h1 class="page-header">
-                    Page Heading
+                    Categorias
                 </h1>
 
                 <?php 
                     if(isset($_GET["category"])) {
-                        $cat_id = mysqli_real_escape_string($connection, $_GET["category"]);
+                        $cat_id = $_GET["category"];
                     }
-                    if(is_admin($_SESSION["username"])) {
+                    if(isset($_SESSION["username"]) && is_admin($_SESSION["username"])) {
                         $query1 = mysqli_prepare($connection, "SELECT post_id, post_title, post_autor, post_date, post_img, post_content
                                                                     FROM posts WHERE post_cat = ?");
                     } else {

@@ -12,53 +12,49 @@
 
         move_uploaded_file($post_image_temp, "../images/$post_image");
 
-        $query = "INSERT INTO posts(post_cat, post_title, post_autor, post_date, post_img, post_content, post_tags, post_comment_count, post_status) VALUES ($post_cat, '$post_title', '$post_autor', NOW() , '$post_image', '$post_content', '$post_tags', '$post_comments_count', '$post_status');";
-
-        $create_post_query = mysqli_query($connection, $query);
-        confirm_query($create_post_query);
-
-        $post_id = mysqli_insert_id($connection); #saca la ultima id creada
-
-        echo "<p class='bg-success'>Post Created, <a href='../post.php?p_id=$post_id'>View Post </a></p>";
-
+        $query = "INSERT INTO posts(post_cat, post_title, post_autor, post_date, post_img, post_content, post_tags, post_comment_count, post_status) 
+    VALUES (?,?, ?, NOW() , ?, ?, ?, ?, ?)";
+        $stmt = mysqli_prepare($connection,$query);
+        mysqli_stmt_bind_param($stmt, "isssssss", $post_cat, $post_title, $post_autor, $post_image, $post_content, $post_autor, $post_comments_count, $post_status);
+        mysqli_stmt_execute($stmt);
+        $post_id = mysqli_stmt_insert_id($stmt); #saca la ultima id creada
+        mysqli_stmt_close($stmt);
+        echo "<p class='bg-success'>Post creado, <a href='../post.php?p_id=$post_id'>Ver post</a></p>";
     }
 ?>
 
 <form method="POST" action="" enctype="multipart/form-data">
     <div class="form-group">
-        <label for="post_title">Post Title</label>
+        <label for="post_title">Titulo</label>
         <input type="text" class="form-control" name="post_title" id="post_title">
     </div>
     <div class="form-group">
-        <label for="post_category">Post Category</label>
+        <label for="post_category">Categoria</label>
         <br/>
         <select name="post_cat" id="post_category">
             <?php 
-                $query = "SELECT * FROM categories;";
-                $select_categories = mysqli_query($connection, $query);
-
-                confirm_query($select_categories);
-
-                while($row = mysqli_fetch_assoc($select_categories)) {
-                    $cat_id = $row["cat_id"];
-                    $cat_title = $row["cat_title"];
-
+                $query = "SELECT cat_id, cat_title FROM categories;";
+                $stmt = mysqli_prepare($connection,$query);
+                mysqli_stmt_execute($stmt);
+                mysqli_stmt_bind_result($stmt, $cat_id, $cat_title);
+                while(mysqli_stmt_fetch($stmt)) :
                     echo "<option value='$cat_id'>$cat_title</option>";
-                }
+                endwhile;
+                mysqli_stmt_close($stmt);
             ?>
         </select>
     </div>
     <div class="form-group">
-        <label for="post_status">Post Status</label>
+        <label for="post_status">Estado</label>
         </br>
         <select name="post_status" id="post_status">
-            <option value="draft">draft</option>
-            <option value="live">live</option>  
+            <option value="draft">Borrador</option>
+            <option value="live">Activo</option>
         </select>
         
     </div>
     <div class="form-group">
-        <label for="post_img">Post Image</label>
+        <label for="post_img">Imagen</label>
         <input type="file" name="post_img" id="post_img">
     </div>
     <div class="form-group">
@@ -66,11 +62,11 @@
         <input type="text" class="form-control" name="post_tags" id="post_tags">
     </div>
     <div class="form-group">
-        <label for="summernote">Post Content</label>
+        <label for="summernote">Contenido</label>
         <textarea type="text" class="form-control" name="post_content" id="summernote" cols="30" rows="10"></textarea>
     </div>
      <div class="form-group">
-        <input type="submit" class="btn btn-primary" name="create_post" value="Publish Post">
+        <input type="submit" class="btn btn-primary" name="create_post" value="Publicar Post">
     </div>
 
 </form>

@@ -13,43 +13,13 @@
                 <?php
                     if(isset($_GET["p_id"])) {
                         $post_id = $_GET["p_id"];
-                        $query = "SELECT * FROM posts WHERE post_id = $post_id";
-                        $select_all_posts_query = mysqli_query($connection, $query);
-
-                        while($row = mysqli_fetch_assoc($select_all_posts_query)) {
-                            $post_title = $row["post_title"];
-                            $post_autor = $row["post_autor"];
-                            $post_date = $row["post_date"];
-                            $post_img = $row["post_img"];
-                            $post_content = $row["post_content"];
-                            $post_viewcount = $row["post_viewcount"];
-                        }
-
-                        $query = "SELECT * FROM users WHERE user_id = $post_autor";
-                        $select_autor = mysqli_query($connection, $query);
-
-                        while($row = mysqli_fetch_array($select_autor)) {
-                            $user_first_name = $row["user_first_name"];
-                            $user_last_name = $row["user_last_name"];
-                        }
-
-
-                 /*        $query = "UPDATE posts SET post_viewcount = $post_viewcount + 1 WHERE post_id = $post_id;";
-                        $update_count_query = mysqli_query($connection, $query); */
-
-
-
-
-                        /* if(!$update_count_query) {
-                            die("query failed" . mysqli_error($connection, $update_count_query));
-                        } */
-
-                   
-                    
+                        $query = mysqli_prepare($connection, "SELECT post_title, post_autor, post_date, post_img, post_content, post_viewcount, user_first_name, user_last_name FROM posts INNER JOIN users ON user_id = post_autor WHERE post_id = ?");
+                        mysqli_stmt_bind_param($query, "i", $post_id);
+                        mysqli_stmt_execute($query);
+                        mysqli_stmt_bind_result($query, $post_title, $post_autor, $post_date, $post_img, $post_content, $post_viewcount, $user_first_name, $user_last_name);
+                        mysqli_stmt_fetch($query);
+                        mysqli_stmt_close($query);
                 ?>
-
-
-               
                 <!-- Blog Post -->
                 
                 <h2>
@@ -64,9 +34,8 @@
                 <hr>
                 <p><?php echo $post_content; ?></p>
 
-
                 <hr>
-                  
+
                 <?php
                     } else {
                         header("Location: index.php");
@@ -75,27 +44,26 @@
 
                 <!-- Blog Comments -->
 
-
                 <?php 
                     if(isset($_POST["create_comment"])) {
                         $post_id = $_GET["p_id"];
                         $comment_autor = $_POST["comment_autor"];
                         $comment_email = $_POST["comment_email"];
                         $comment_content = $_POST["comment_content"];
+                        $unapproved = "unapproved";
 
                         if(!empty($comment_autor) && !empty($comment_email) && !empty($comment_content)) {
-                            $query = "INSERT INTO comments (comment_post_id, comment_autor, comment_email, comment_content, comment_status, comment_date) VALUES ($post_id, '$comment_autor', '$comment_email', '$comment_content', 'unapproved', NOW());"; 
 
-                            $create_comment_query = mysqli_query($connection, $query);
-                            if(!$create_comment_query) {
-                                die("query failed" . mysqli_error($connection));
-                            }
+                            $stmt = mysqli_prepare($connection,"INSERT INTO comments(comment_post_id, comment_autor, comment_email, comment_content, comment_status, comment_date) 
+                                                                        VALUES (?,?,?,?,?, NOW())");
+                            mysqli_stmt_bind_param($stmt, "issss", $post_id, $comment_autor, $comment_email, $comment_content, $unapproved) or die( mysqli_stmt_error($stmt) );
+                            mysqli_stmt_execute($stmt);
+                            mysqli_stmt_close($stmt);
 
-                            $query = "UPDATE posts SET post_comment_count = (SELECT COUNT(*) FROM comments WHERE comment_post_id = $post_id) WHERE post_id = $post_id;";
-                            $update_commends_count = mysqli_query($connection, $query);
-                            if(!$update_commends_count) {
-                                die("query failed" . mysqli_error($connection));
-                            }
+                            $stmt = mysqli_prepare($connection, "UPDATE posts SET post_comment_count = (SELECT COUNT(*) FROM comments WHERE comment_post_id = ?) WHERE post_id = ?");
+                            mysqli_stmt_bind_param($stmt, "ii", $post_id, $post_id);
+                            mysqli_stmt_execute($stmt);
+                            mysqli_stmt_close($stmt);
                         } else {
                             echo "<script>alert('Fields cannot be empty');</script>";
                         }
@@ -128,14 +96,12 @@
                 
                 <?php
                     $post_id = $_GET["p_id"];
-                    $query = "SELECT * FROM comments WHERE comment_post_id = $post_id AND comment_status = 'approved' ORDER BY comment_id DESC;";
-                    $get_comments = mysqli_query($connection, $query);
+                    $stmt = mysqli_prepare($connection, "SELECT comment_autor, comment_date, comment_content, comment_email FROM comments WHERE comment_post_id = ? AND comment_status = 'approved' ORDER BY comment_id DESC;");
+                    mysqli_stmt_bind_param($stmt, "i", $post_id);
+                    mysqli_stmt_execute($stmt);
+                    mysqli_stmt_bind_result($stmt, $comment_autor, $comment_date, $comment_content, $comment_email);
+                    while(mysqli_stmt_fetch($stmt)) :
 
-                    while($row = mysqli_fetch_array($get_comments)) {
-                        $comment_autor = $row["comment_autor"];
-                        $comment_date = $row["comment_date"];
-                        $commend_content = $row["comment_content"];
-                        $commend_email = $row["comment_email"];
                 ?>
                 <!-- Comment -->
                 <div class="media">
@@ -146,11 +112,12 @@
                         <h4 class="media-heading"><?php echo $comment_autor ?>
                             <small><?php echo $comment_date ?></small>
                         </h4>
-                        <?php echo $commend_content ?>
+                        <?php echo $comment_content ?>
                     </div>
                 </div>  
                 <?php
-                     }
+                     endwhile;
+                     mysqli_stmt_close($stmt);
                 ?>
             </div>
 

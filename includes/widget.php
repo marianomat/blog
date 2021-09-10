@@ -1,4 +1,5 @@
  <div class="well">
-    <h4>Side Widget Well</h4>
-    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Inventore, perspiciatis adipisci accusamus laudantium odit aliquam repellat tempore quos aspernatur vero.</p>
+    <h4>Sobre mi</h4>
+    <p>Estudiante avanzado de la carrera Contador Público (UNR) y realizando una Tecnicatura Universitaria en Programación en la Universidad Austral.
+        Poseo un gran interén en el mundo del desarrollo de software y programación web.</p>
 </div>
