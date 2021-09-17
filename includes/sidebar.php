@@ -31,6 +31,8 @@
                                         <button class="btn btn-primary" type="submit" name="login">
                                             Desloguear
                                         </button>
+                                        <p></p>
+                                        <a class="btn btn-primary" href='admin'> Panel Usuario </a>
                                     </span>
                                 </div>
                             </form>
@@ -72,7 +74,7 @@
                 ?>
 
                 <div class="well">
-                    <h4>Blog Categories</h4>
+                    <h4>Categorías</h4>
                     <div class="row">
                         <div class="col-lg-12">
                             <ul class="list-unstyled">

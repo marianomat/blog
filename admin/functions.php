@@ -168,6 +168,7 @@
             $_SESSION["user_first_name"] = $db_user_first_name;
             $_SESSION["user_last_name"] = $db_user_last_name;
             $_SESSION["user_role"] = $db_user_role;
+            $_SESSION["user_email"] = $db_user_email;
             redirect("/cms/admin");
             # redirect("https://marianopereyra.com/blog/admin");
         }   else {

@@ -16,7 +16,7 @@
                         if(isset($_GET["autor"])) {
                             echo "Posts by " . $_GET["autor"];
                         } else {
-                            echo "Ultimos Posts";
+
                         }
                     ?>
                 </h1>
@@ -43,13 +43,13 @@
 
                         if(isset($_GET["autor"])) {
                             $post_autor = $_GET["autor"];
-                            $query = "SELECT user_id, post_id, post_title, post_autor, post_date, post_img, post_status, post_content, user_first_name, user_last_name FROM posts INNER JOIN users ON user_id = post_autor WHERE post_autor = ? AND post_status = 'live' LIMIT ?,5";
+                            $query = "SELECT user_id, post_id, post_title, post_autor, post_date, post_img, post_status, post_content, user_first_name, user_last_name FROM posts INNER JOIN users ON user_id = post_autor WHERE post_autor = ? AND post_status = 'live' ORDER BY post_date DESC LIMIT ?,5";
                             $stmt = mysqli_prepare($connection, $query);
                             mysqli_stmt_bind_param($stmt, "ii", $post_autor, $page_1);
                             mysqli_stmt_execute($stmt);
                             mysqli_stmt_bind_result($stmt,$user_id, $post_id, $post_title, $post_autor, $post_date, $post_img, $post_status,  $post_content, $user_first_name, $user_last_name);
                         } else {
-                            $query = "SELECT user_id, post_id, post_title, post_autor, post_date, post_img, post_status, post_content, user_first_name, user_last_name FROM posts INNER JOIN users ON user_id = post_autor WHERE post_status = 'live' LIMIT ?,5";
+                            $query = "SELECT user_id, post_id, post_title, post_autor, post_date, post_img, post_status, post_content, user_first_name, user_last_name FROM posts INNER JOIN users ON user_id = post_autor WHERE post_status = 'live' ORDER BY post_date DESC LIMIT ?,5 ";
                             $stmt = mysqli_prepare($connection, $query);
                             mysqli_stmt_bind_param($stmt, "i", $page_1);
                             mysqli_stmt_execute($stmt);
@@ -65,17 +65,19 @@
                                 <h2>
                                     <a href="post.php?p_id=<?php echo $post_id;?>"><?php echo $post_title; ?></a>
                                 </h2>
-                                <p class="lead">
+                                <p class="">
                                     by <a href="index.php?autor=<?php echo $user_id ?>"><?php echo $user_first_name . " ".$user_last_name; ?></a>
                                 </p>
                                 <p><span class="glyphicon glyphicon-time"></span> Posted on <?php echo $post_date; ?></p>
-                                <hr>
+<!--                                <hr>-->
                                 <a href="post.php?p_id=<?php echo $post_id;?>"><img class="img-responsive" src="images/<?php echo $post_img; ?>" alt=""></a>
-                                <hr>
+                                <BR>
                                 <p><?php echo $post_content; ?></p>
                                 <a class="btn btn-primary" href="post.php?p_id=<?php echo $post_id;?>">Ver Post <span class="glyphicon glyphicon-chevron-right"></span></a>
 
                                 <hr>
+                                <hr>
+
                             <?php
                             }
                         }

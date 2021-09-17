@@ -65,28 +65,40 @@
                             mysqli_stmt_execute($stmt);
                             mysqli_stmt_close($stmt);
                         } else {
-                            echo "<script>alert('Fields cannot be empty');</script>";
+                            echo "<script>alert('Fields cannot be empty $comment_autor $comment_email $comment_content');</script>";
                         }
                     }
                 ?>
 
                 <!-- Comments Form -->
                 <div class="well">
-                    <h4>Leave a Comment:</h4>
+                    <h4>Dejar un comentario:</h4>
                     <form action="" method="POST" role="form">
+                        <?php
+                            if(isset($_SESSION["username"])) {
+                                ?>
+                                <div  hidden class="form-group">
+                                    <input  value="<?php echo $_SESSION['user_first_name'] || 'Anonimo'?>"  type="hidden" id="comment_autor" name="comment_autor" class="form-control"></input>
+                                </div>
+                                <div  hidden class="form-group">
+                                    <input  value="<?php echo $_SESSION['user_email']?>"  type="hidden" id="comment_email" name="comment_email" class="form-control" ></input>
+                                </div>
+                            <?php } else { ?>
+                                <div class="form-group">
+                                    <label for="comment_autor">Autor</label>
+                                    <input  type="text" id="comment_autor" name="comment_autor" class="form-control" required></input>
+                                </div>
+                                <div class="form-group">
+                                    <label for="comment_email">Email</label>
+                                    <input type="email" id="comment_email" name="comment_email" class="form-control" required ></input>
+                                </div>
+
+                            <?php } ?>
                         <div class="form-group">
-                            <label for="comment_autor">Autor</label>
-                            <input type="text" id="comment_autor" name="comment_autor" class="form-control" required></input>
-                        </div>
-                        <div class="form-group">
-                            <label for="comment_email">Email</label>
-                            <input type="email" id="comment_email" name="comment_email" class="form-control" required ></input>
-                        </div>
-                        <div class="form-group">
-                            <label for="comment_content">Comment</label>
+                            <label for="comment_content">Comentario</label>
                             <textarea name="comment_content" id="comment_content" class="form-control"  rows="3" required></textarea>
                         </div>
-                        <button type="submit" name="create_comment" class="btn btn-primary">Submit</button>
+                        <button type="submit" name="create_comment" class="btn btn-primary">Enviar</button>
                     </form>
                 </div>
 
